@@ -1,6 +1,32 @@
-:#!/usr/bin/perl 
+#!/usr/bin/perl 
+#
+#import libraries
+#
+#
+#
+#package HollieBerries;
+use strict;
+use warnings;
+use Getopt::Std;
 
-$usage = << '*END*';
+## default parameters
+#
+#
+use vars qw($debugQ $usage %opt $skip_char $format_str $test_input_line @input_header);
+
+$debugQ=0;
+$format_str = 'R%8.2f%s%s\n';
+$skip_char = '#';
+$test_input_line = 
+@input_header = ("Supplier ID","Product Code","Product Description","Delivery Date","Unit Price","Number of Units");
+
+print @input_header if $debugQ;
+
+$test_input_line="15,1101,\"Apples 1kg Golden Delicious. The sweetest Apples! Always a favourite. Love, Mrs. Hollingberry\",\"2012/02/15\",1505,5";
+
+print $test_input_line if $debugQ;
+
+$usage = << "*END*";
 
 #===============================================================================
 #
@@ -11,12 +37,12 @@ $usage = << '*END*';
 #  DESCRIPTION:  
 #
 #      OPTIONS:  -h help
-#                -s comment character [ default: $skip_char ]
-#                -p printf formatting string [ default: $format_str ]
+#                -s comment character [ default: \'$skip_char\' ]
+#                -p printf formatting string [ default: \"$format_str\" ]
 # REQUIREMENTS:  ---
 #         BUGS:  ---
 #        NOTES:  ---
-#       AUTHOR:  lkunchun, eletik97@gmail.com
+#       AUTHOR:  lkunchun, eletik97\@gmail.com
 #      COMPANY:  J & K, Roos' Cafe
 #      VERSION:  1.0
 #      CREATED:  05/01/2014 08:27:49 PM
@@ -25,104 +51,96 @@ $usage = << '*END*';
 
 *END*
 
-##import libraries
-use strict;
-use warnings;
-use Getopt::Std;
-
 getopts('hs:p:',\%opt);
 
 ##print help menu
 die "$usage" if defined $opt{'h'};
-
-$skip_char = '#';
-$format_str = 'R%8.2f%s%s\\n';
-
 $skip_char = $opt{'s'} if defined $opt{'s'};
 $format_str = $opt{'p'} if defined $opt{'p'};
 
-################################################################################
-#define some default parameters:
-################################################################################
 
-die 'column not specifies\n' unless defined $opt{'c'};
-die '-c flag acceps only numbers\n' unless ($opt{'c'} =~/[0-9]/);
+#################################################################################
+##define some default parameters:
+#################################################################################
 
-$col = $opt{'c'};
+#die 'column not specifies\n' unless defined $opt{'c'};
+#die '-c flag acceps only numbers\n' unless ($opt{'c'} =~/[0-9]/);
 
-@sorted = ();
-@index = ();
+#$col = $opt{'c'};
 
-$delim = '[ \t]+';
-$delim = $opt{'d'} if defined $opt{'d'};
+#@sorted = ();
+#@index = ();
+
+#$delim = '[ \t]+';
+#$delim = $opt{'d'} if defined $opt{'d'};
 
 
-while(<STDIN>) {
+#while(<STDIN>) {
 
-   chomp;
+   #chomp;
 
-   next if (/$skip/); 
-   next if (/^$/);
+   #next if (/$skip/); 
+   #next if (/^$/);
 
-   push @sorted, $_;
-   push @index, &get_key($_);
-   next;
+   #push @sorted, $_;
+   #push @index, &get_key($_);
+   #next;
    
 
-}
+#}
 
-$exchange = 1;
-while($exchange > 0) {
+#$exchange = 1;
+#while($exchange > 0) {
 
 
-   $exchange = 0;
-   for($jj=0;$jj<$#index;$jj++) {
+   #$exchange = 0;
+   #for($jj=0;$jj<$#index;$jj++) {
 
-      if($index[$jj] > $index[$jj+1]) {
+      #if($index[$jj] > $index[$jj+1]) {
 
-         $exchange ++;
-         #print STDERR "switch";
-         $temp = $index[$jj];
-         $index[$jj] = $index[$jj+1];
-         $index[$jj+1] = $temp;
+         #$exchange ++;
+         ##print STDERR "switch";
+         #$temp = $index[$jj];
+         #$index[$jj] = $index[$jj+1];
+         #$index[$jj+1] = $temp;
 
-         $temp = $sorted[$jj];
-         $sorted[$jj] = $sorted[$jj+1];
-         $sorted[$jj+1] = $temp;
+         #$temp = $sorted[$jj];
+         #$sorted[$jj] = $sorted[$jj+1];
+         #$sorted[$jj+1] = $temp;
 
-      }
+      #}
 
-   }
+   #}
 
-}
+#}
 
-if (defined $opt{'r'}) {
+#if (defined $opt{'r'}) {
 
-   for($ii=$#sorted;$ii >= 0; $ii--) {
+   #for($ii=$#sorted;$ii >= 0; $ii--) {
 
-      #print "$index[$ii] $sorted[$ii]\n";
-      print "$sorted[$ii]\n";
+      ##print "$index[$ii] $sorted[$ii]\n";
+      #print "$sorted[$ii]\n";
 
-   }
-} 
-else {
+   #}
+#} 
+#else {
 
-   foreach(@sorted) {
-      print;
-      print "\n";
-   }
+   #foreach(@sorted) {
+      #print;
+      #print "\n";
+   #}
 
-}
+#}
 
-sub get_key() {
+#sub get_key() {
 
-   my $str = shift;
-   my @tokens;
+   #my $str = shift;
+   #my @tokens;
 
-   @tokens = split /$delim/, $str;
-   die "column $col does not exist\n" unless defined $tokens[$col];
-   #print STDERR "index = $tokens[$col]\n";
-   return $tokens[$col];
+   #@tokens = split /$delim/, $str;
+   #die "column $col does not exist\n" unless defined $tokens[$col];
+   ##print STDERR "index = $tokens[$col]\n";
+   #return $tokens[$col];
  
-}
+#}
 
