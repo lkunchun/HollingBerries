@@ -12,19 +12,19 @@ use Getopt::Std;
 ## default parameters
 #
 #
-use vars qw($debugQ $usage %opt $skip_char $format_str $test_input_line @input_header);
+use vars qw(*INPUT_HANDLE $test_input_file $usage %opt $skip_char $format_str $test_input_line @input_header);
 
-$debugQ=0;
+*INPUT_HANDLE=\*STDIN;
 $format_str = 'R%8.2f%s%s\n';
 $skip_char = '#';
-$test_input_line = 
+
 @input_header = ("Supplier ID","Product Code","Product Description","Delivery Date","Unit Price","Number of Units");
 
-print @input_header if $debugQ;
 
 $test_input_line="15,1101,\"Apples 1kg Golden Delicious. The sweetest Apples! Always a favourite. Love, Mrs. Hollingberry\",\"2012/02/15\",1505,5";
 
-print $test_input_line if $debugQ;
+$test_input_file="../../produce.csv";
+
 
 $usage = << "*END*";
 
@@ -51,12 +51,55 @@ $usage = << "*END*";
 
 *END*
 
-getopts('hs:p:',\%opt);
+getopts('dhs:p:',\%opt);
 
 ##print help menu
 die "$usage" if defined $opt{'h'};
 $skip_char = $opt{'s'} if defined $opt{'s'};
 $format_str = $opt{'p'} if defined $opt{'p'};
+
+print "@input_header \n" if defined $opt{'d'};
+print "$test_input_line  \n"if defined $opt{'d'};
+
+sub open_input_file {
+  my $infile_name = shift;
+  open(INFILE, $infile_name) or die "ERROR:  Could not open $infile_name.\n";
+}
+
+sub close_input_file {
+   close(INPUT_HANDLE);
+}
+
+sub cvs_line_to_list {
+    #take input as a line of text deliminated by comma and white space and
+    #return a list
+    my $line_text=shift;
+    my @rtn_list;
+    @rtn_list = split /\s?,\s?/, $line_text;
+    return \@rtn_list; #return array reference, reduce copying
+}
+
+sub print_list {
+    #takes an array reference and print
+    my $list_ref=shift;
+    printf $format_str, @$list_ref[()];
+}
+
+sub translate_one_line() {
+    my ($line_of_text,$cvs_to_list, $print_list) = @_;
+    $print_list->($cvs_to_list->($line_of_text));
+}
+
+translate_one_line($test_input_line, \&cvs_to_list, \&print_list) if defined $opt{'d'}; 
+
+open_input_file($test_input_file);
+while(<INPUT_HANDLE>) {
+    if(!($_ =~ /$input_header[0]/)) {
+        #skip lines that look like header   
+        translate_one_line($_, \&cvs_line_to_list, \&print_list); 
+    } 
+}
+close_input_file();
 
 
 #################################################################################
